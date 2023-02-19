@@ -1,5 +1,5 @@
 ifneq ($(KERNELRELEASE), )
-  obj-m := main.o
+  obj-m := CharSnake.o
 else
   KERN_DIR := /lib/modules/$(shell uname -r)/build
   PWD := $(shell pwd)

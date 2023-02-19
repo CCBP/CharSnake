@@ -20,7 +20,7 @@ typedef struct _MAP_DEV {
 static dev_t dev;
 static int major = 0;
 static int minor = 0;
-static const char *DEV_NAME = "CharacterSnake";
+static const char *DEV_NAME = "CharSnake";
 static MAP_DEV *chrSnakeMap;
 
 static void DestoryMapData(MAP_DEV *map_dev)
@@ -40,6 +40,10 @@ static ssize_t SnakeDraw(struct file *fp, char __user *buffer, size_t size, loff
         if (copy_to_user(buffer, (map_dev->data + *pos), result))
         {
             result = -EFAULT;
+        }
+        else
+        {
+            *pos += result;
         }
     }
     printk(KERN_ALERT "[%s] draw a map, size: %ld  pos: %lld  result: %d\n", 
