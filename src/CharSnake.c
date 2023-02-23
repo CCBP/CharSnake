@@ -15,7 +15,7 @@ typedef struct _MAP_DEV {
     struct cdev cdev;
 } MAP_DEV;
 
-#define MAP_SIZE (9 * 9)
+#define MAP_SIZE (64 * 64)
 
 static dev_t dev;
 static int major = 0;
@@ -102,12 +102,45 @@ static int SnakeStop(struct inode *inode, struct file *fp)
     return 0;
 }
 
+static loff_t SnakeSeek(struct file *fp, loff_t offset, int whence)
+{
+    MAP_DEV *map_dev = fp->private_data;
+    loff_t pos;
+
+    switch (whence)
+    {
+    case 0: // SEEK_SET
+        pos = offset;
+        break;
+    case 1: // SEEK_CUR
+        pos = fp->f_pos + pos;
+        break;
+    case 2: // SEEK_END
+        pos = map_dev->size + pos;
+        break;
+    default:
+        pos = -EINVAL;
+        goto fail;
+    }
+    if (pos < 0)
+    {
+        pos = -EINVAL;
+        goto fail;
+    }
+    fp->f_pos = pos;
+    printk(KERN_ALERT "[%s] seek, offset: %lld  whence: %d  pos: %lld\n", 
+        DEV_NAME, offset, whence, pos);
+fail:
+    return pos;
+}
+
 struct file_operations fops = {
     .owner   = THIS_MODULE,
     .open    = SnakeStart,
     .release = SnakeStop,
     .read    = SnakeDraw,
     .write   = SnakeMove,
+    .llseek  = SnakeSeek,
 };
 
 static int SnakeSetupDev(MAP_DEV *map_dev, int index)
