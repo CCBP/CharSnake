@@ -7,13 +7,12 @@
  * 用于表示蛇的运动方向
  */
 typedef enum {
-    DIR_UP = 0,
-    DIR_DOWN,
-    DIR_LEFT,
-    DIR_RIGHT,
-
-    DIR_MAX // 暂停移动
-} dir_t;    // 方向类型
+    DIR_UP = 0,         // 向上移动
+    DIR_DOWN,           // 向下移动
+    DIR_LEFT,           // 向左移动
+    DIR_RIGHT,          // 向右移动
+    DIR_PAUSE           // 暂停移动
+} dir_t;
 
 /**
  * 用于表示游戏的运行状态
@@ -23,7 +22,7 @@ typedef enum {
     STATE_SUCCESS,      // 游戏成功
     STATE_FAILED,       // 游戏失败
     STATE_PAUSE         // 游戏暂停
-} state_t;  // 游戏状态
+} state_t;
 
 typedef struct _snake_t snake_t;
 

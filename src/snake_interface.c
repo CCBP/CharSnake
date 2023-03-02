@@ -24,6 +24,7 @@ const char SNAKE_DRAW_BODY = '#';    // 蛇身
 const char SNAKE_DRAW_TAIL = '*';    // 蛇尾
 const char SNAKE_DRAW_FOOD = '$';    // 食物
 const char SNAKE_DRAW_MAP  = '.';    // 地图
+const char SNAKE_DRAW_LF   = '\n';   // 换行符
 
 struct _snake_t {
     state_t state;                   // 游戏状态
@@ -206,6 +207,17 @@ void snake_map_refresh(snake_t *snake)
 }
 
 /**
+ * snake_get_map_size - 获取地图尺寸（占用的内存空间）
+ * @snake: 需要获取地图尺寸的snake_t类型指针
+ *
+ * Return: 地图尺寸（占用的内存空间）
+ */
+size_t snake_get_map_size(snake_t *snake)
+{
+    return snake->map_size * snake->map_size + snake->map_size;
+}
+
+/**
  * snake_init - snake的构造函数
  * @snake: 需要初始化snake_t类型指针
  * @map_size: 初始化地图大小，其值应为正方形地图的边长，若为偶数则自动加1使地图中心对称
@@ -234,24 +246,26 @@ int snake_init(snake_t *snake, size_t map_size)
     }
 
     snake->map_size = map_size;
-    map_size *= map_size;
-    snake->map_raw = kmalloc(map_size, GFP_KERNEL);
+    // 申请储存原始地图数据所需的内存空间
+    snake->map_raw = kmalloc(map_size * map_size, GFP_KERNEL);
     if (NULL == snake->map_raw) {
         kfree(snake);
         result = -ENOMEM;
         goto fail;
     }
-    snake->map_draw = kmalloc(map_size, GFP_KERNEL);
+    memset(snake->map_raw, SNAKE_RAW_MAP, map_size * map_size);
+    // 申请绘制地图所需的内存空间，需留出换行符所需空间
+    snake->map_draw = kmalloc(snake_get_map_size(snake), GFP_KERNEL);
     if (NULL == snake->map_draw) {
         kfree(snake->map_raw);
         kfree(snake);
         result = -ENOMEM;
         goto fail;
     }
+    memset(snake->map_draw, SNAKE_DRAW_MAP, snake_get_map_size(snake));
     result = map_size;      // 构造成功
-    memset(snake->map_raw, SNAKE_RAW_MAP, map_size);
 
-    snake->move_dir = DIR_MAX;
+    snake->move_dir = DIR_PAUSE;
     // 蛇头初始化在地图中心
     snake->head_x = snake->map_size / 2;
     snake->head_y = snake->map_size / 2;
@@ -275,17 +289,6 @@ void snake_deinit(snake_t *snake)
 }
 
 /**
- * snake_get_map_size - 获取地图尺寸（占用的内存空间）
- * @snake: 需要获取地图尺寸的snake_t类型指针
- *
- * Return: 地图尺寸（占用的内存空间）
- */
-size_t snake_get_map_size(snake_t *snake)
-{
-    return snake->map_size * snake->map_size;
-}
-
-/**
  * snake_draw_map - 绘制由原始数据转换而来的地图
  * @snake: 需要绘制地图的snake_t类型指针
  * 
@@ -293,7 +296,7 @@ size_t snake_get_map_size(snake_t *snake)
  */
 char *snake_draw_map(snake_t *snake)
 {
-    for (int i = 0; i < snake_get_map_size(snake); i++) {
+    for (int i = 0, j = 0; j < snake_get_map_size(snake); i++, j++) {
         char data_raw = *(snake->map_raw + i);
         char data_draw;
         switch (data_raw) {
@@ -323,7 +326,11 @@ char *snake_draw_map(snake_t *snake)
                     break;
             }
         }
-        *(snake->map_draw + i) = data_draw;
+        *(snake->map_draw + j) = data_draw;
+        if (snake->map_size - 1 == i) { // 绘制换行符
+            j += 1;
+            *(snake->map_draw + j) = SNAKE_DRAW_LF;
+        }
     }
     return snake->map_draw;
 }
@@ -332,8 +339,6 @@ char *snake_draw_map(snake_t *snake)
  * snake_set_dir - 设置snake的移动方向
  * @snake: 需要设置移动方向的snake_t类型指针
  * @dir: 移动方向
- *
- * dir设置为DIR_MAX为暂停移动，相当于暂停游戏
  */
 void snake_set_dir(snake_t *snake, dir_t dir)
 {
