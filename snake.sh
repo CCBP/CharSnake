@@ -9,8 +9,8 @@ Warring="[${Yellow_font_prefix}警告${Font_color_suffix}]"
 Error="[${Red_font_prefix}错误${Font_color_suffix}]"
 
 Pwd="$(pwd)"
-Module="CharSnake"
-Device="CharSnake"
+Module="snake"
+Device="char_snake"
 Mod="666"
 
 CheckRoot() {
