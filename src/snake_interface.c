@@ -160,7 +160,7 @@ void snake_map_refresh(snake_t *snake)
     int new_head_y = snake->head_y;
 
     if (snake_is_success(snake)) {
-        return;     // 游戏成功，无法移动
+        return;     // 游戏成功，禁止移动
     }
 
     switch (snake->move_dir) {
@@ -217,6 +217,7 @@ int snake_init(snake_t *snake, size_t map_size)
     int result = 0;
 
     if (map_size <= 0) {
+        snake = NULL;
         result = -EINVAL;
         goto fail;
     }
@@ -228,7 +229,6 @@ int snake_init(snake_t *snake, size_t map_size)
 
     snake = kmalloc(sizeof(snake_t), GFP_KERNEL);
     if (NULL == snake) {
-        snake = NULL;
         result = -ENOMEM;
         goto fail;
     }
@@ -255,7 +255,7 @@ int snake_init(snake_t *snake, size_t map_size)
     // 蛇头初始化在地图中心
     snake->head_x = snake->map_size / 2;
     snake->head_y = snake->map_size / 2;
-    snake->length = SNAKE_RAW_TAIL;
+    snake->length = 1;       // 初始长度为1
     snake_map_refresh(snake);// 生成蛇头
     generate_food(snake);    // 生成食物
 
