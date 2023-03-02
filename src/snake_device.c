@@ -75,7 +75,7 @@ static ssize_t snake_write(struct file *fp, const char __user *buffer, size_t si
             dir = DIR_RIGHT;
             break;
         case 'P':   // 暂停
-            dir = DIR_MAX;
+            dir = DIR_PAUSE;
             break;
         default:
             result = -EINVAL;
