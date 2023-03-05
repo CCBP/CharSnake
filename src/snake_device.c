@@ -28,6 +28,7 @@ static ssize_t snake_read(struct file *fp, char __user *buffer, size_t size, lof
     int result = 0;
 
     if (NULL != sdev->snake) {
+        snake_map_refresh(sdev->snake);
         map_data = snake_draw_map(sdev->snake);   // 获取地图
         if (NULL == map_data) {
             printk(KERN_ALERT "[%s] can not draw a map!", DEV_NAME);
