@@ -71,6 +71,8 @@ static void set_map_raw(snake_t *snake, int x, int y, char data)
  * @snake: 需要判断是否超出地图的snake_t类型指针
  * @x: 目标位置的x轴坐标
  * @y: 目标位置的y轴坐标
+ * 
+ * Return: true 超出地图 false 未超出地图
  */
 static bool is_beyond_border(snake_t *snake, int x, int y)
 {
@@ -122,8 +124,8 @@ static void snake_refresh(snake_t *snake, int x, int y, char last_data)
  */
 static void generate_food(snake_t *snake)
 {
-    char random_x;
-    char random_y;
+    unsigned char random_x;
+    unsigned char random_y;
     char data = SNAKE_RAW_MAX;
     do {
         get_random_bytes(&random_x, sizeof(random_x));
@@ -131,7 +133,8 @@ static void generate_food(snake_t *snake)
         if (!is_beyond_border(snake, random_x, random_y)) {
             data = get_map_raw(snake, random_x, random_y);
         }
-    } while (SNAKE_RAW_MAP == data);
+        printk(KERN_ALERT "x: %d  y: %d\n", random_x, random_y);
+    } while (SNAKE_RAW_MAX == data);
     set_map_raw(snake, random_x, random_y, SNAKE_RAW_FOOD);
 }
 
