@@ -332,7 +332,7 @@ char *snake_draw_map(snake_t *snake)
             }
         }
         *(snake->map_draw + j) = data_draw;
-        if (snake->map_size - 1 == i) { // 绘制换行符
+        if ((i + 1) % snake->map_size == 0) { // 绘制换行符
             j += 1;
             *(snake->map_draw + j) = SNAKE_DRAW_LF;
         }
