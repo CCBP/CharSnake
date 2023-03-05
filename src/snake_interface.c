@@ -211,6 +211,8 @@ void snake_map_refresh(snake_t *snake)
                    (snake->length - 1 != data)) { // 后退
             snake->state = STATE_FAILED;
         }
+    } else {
+        snake->state = STATE_FAILED;
     }
 }
 
