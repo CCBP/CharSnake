@@ -224,12 +224,12 @@ size_t snake_get_map_size(snake_t *snake)
  *
  * Return: 0为初始化成功，非0为初始化失败
  */
-int snake_init(snake_t *snake, size_t map_size)
+int snake_init(snake_t **snake, size_t map_size)
 {
     int result = 0;
 
     if (map_size <= 0) {
-        snake = NULL;
+        *snake = NULL;
         result = -EINVAL;
         goto fail;
     }
@@ -239,39 +239,41 @@ int snake_init(snake_t *snake, size_t map_size)
         map_size += 1;
     }
 
-    snake = kmalloc(sizeof(snake_t), GFP_KERNEL);
-    if (NULL == snake) {
+    *snake = kmalloc(sizeof(snake_t), GFP_KERNEL);
+    if (NULL == *snake) {
         result = -ENOMEM;
         goto fail;
     }
 
-    snake->map_size = map_size;
+    (*snake)->map_size = map_size;
     // 申请储存原始地图数据所需的内存空间
-    snake->map_raw = kmalloc(map_size * map_size, GFP_KERNEL);
-    if (NULL == snake->map_raw) {
-        kfree(snake);
+    (*snake)->map_raw = kmalloc(map_size * map_size, GFP_KERNEL);
+    if (NULL == (*snake)->map_raw) {
+        kfree(*snake);
+        *snake = NULL;
         result = -ENOMEM;
         goto fail;
     }
-    memset(snake->map_raw, SNAKE_RAW_MAP, map_size * map_size);
+    memset((*snake)->map_raw, SNAKE_RAW_MAP, map_size * map_size);
     // 申请绘制地图所需的内存空间，需留出换行符所需空间
-    snake->map_draw = kmalloc(snake_get_map_size(snake), GFP_KERNEL);
-    if (NULL == snake->map_draw) {
-        kfree(snake->map_raw);
-        kfree(snake);
+    (*snake)->map_draw = kmalloc(snake_get_map_size(*snake), GFP_KERNEL);
+    if (NULL == (*snake)->map_draw) {
+        kfree((*snake)->map_raw);
+        kfree(*snake);
+        snake = NULL;
         result = -ENOMEM;
         goto fail;
     }
-    memset(snake->map_draw, SNAKE_DRAW_MAP, snake_get_map_size(snake));
+    memset((*snake)->map_draw, SNAKE_DRAW_MAP, snake_get_map_size(*snake));
     result = map_size;      // 构造成功
 
-    snake->move_dir = DIR_PAUSE;
+    (*snake)->move_dir = DIR_PAUSE;
     // 蛇头初始化在地图中心
-    snake->head_x = snake->map_size / 2;
-    snake->head_y = snake->map_size / 2;
-    snake->length = 1;       // 初始长度为1
-    snake_map_refresh(snake);// 生成蛇头
-    generate_food(snake);    // 生成食物
+    (*snake)->head_x = (*snake)->map_size / 2;
+    (*snake)->head_y = (*snake)->map_size / 2;
+    (*snake)->length = 1;       // 初始长度为1
+    snake_map_refresh(*snake);// 生成蛇头
+    generate_food(*snake);    // 生成食物
 
 fail:
     return result;
@@ -281,11 +283,12 @@ fail:
  * snake_deinit - snake的析构函数
  * @snake: 需要析构的snake_t类型指针
  */
-void snake_deinit(snake_t *snake)
+void snake_deinit(snake_t **snake)
 {
-    kfree(snake->map_raw);
-    kfree(snake->map_draw);
-    kfree(snake);
+    kfree((*snake)->map_raw);
+    kfree((*snake)->map_draw);
+    kfree(*snake);
+    *snake = NULL;
 }
 
 /**

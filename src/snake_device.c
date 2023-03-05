@@ -149,6 +149,13 @@ struct file_operations fops = {
 static int __init snake_dev_init(void)
 {
     int result = 0;
+
+    snake_dev = kmalloc(sizeof(snake_dev_t), GFP_KERNEL);
+    if (NULL == snake_dev) {
+        printk(KERN_ALERT "[%s] snake device init failed!\n", DEV_NAME);
+        result = -ENOMEM;
+        goto fail;
+    }
     
     result = alloc_chrdev_region(&snake_dev->devid, 0, 1, DEV_NAME);
 
@@ -157,16 +164,9 @@ static int __init snake_dev_init(void)
         return result;
     }
 
-    snake_dev = kmalloc(sizeof(snake_dev_t), GFP_KERNEL);
-    if (NULL == snake_dev) {
-        printk(KERN_ALERT "[%s] snake device init failed!\n", DEV_NAME);
-        result = -ENOMEM;
-        goto fail;
-    }
-
-    snake_init(snake_dev->snake, MAP_SIZE);
+    result = snake_init(&snake_dev->snake, MAP_SIZE);
     if (NULL == snake_dev->snake) {
-        printk(KERN_ALERT "[%s] snake init failed!\n", DEV_NAME);
+        printk(KERN_ALERT "[%s] snake init failed! result: %d\n", DEV_NAME, result);
         result = -ENOMEM;
         goto fail;
     }
@@ -180,21 +180,22 @@ static int __init snake_dev_init(void)
         goto fail;
     }
 
-    printk(KERN_ALERT "[%s] init success! major: %d", DEV_NAME, MAJOR(snake_dev->devid));
+    printk(KERN_ALERT "[%s] init success! major: %d\n", DEV_NAME, MAJOR(snake_dev->devid));
     return result;
 
 fail:
     unregister_chrdev_region(snake_dev->devid, 1);
+    printk(KERN_ALERT "[%s] init failed!\n", DEV_NAME);
     return result;
 }
 
 static void __exit snake_dev_exit(void)
 {
     cdev_del(&snake_dev->cdev);
-    snake_deinit(snake_dev->snake);
+    snake_deinit(&snake_dev->snake);
+    unregister_chrdev_region(snake_dev->devid, 1);
     kfree(snake_dev);
     snake_dev = NULL;
-    unregister_chrdev_region(snake_dev->devid, 1);
 
     printk(KERN_ALERT "[%s] exit!\n", DEV_NAME);
     return;

@@ -1,3 +1,5 @@
+EXTRA_CFLAGS += -g
+
 ifneq ($(KERNELRELEASE), )
   obj-m := snake.o
   snake-objs := snake_device.o snake_interface.o
