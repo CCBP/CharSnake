@@ -23,24 +23,24 @@ const char *DEV_NAME = "char_snake";    // 设备名称
 static ssize_t snake_read(struct file *fp, char __user *buffer, size_t size, loff_t *pos)
 {
     snake_dev_t *sdev = fp->private_data;
+    char *map_data = NULL;
+    size_t map_size;
     int result = 0;
 
     if (NULL != sdev->snake) {
-        int   map_size = snake_get_map_size(sdev->snake);
-        char *map_data = kmalloc(map_size, GFP_KERNEL);
+        map_data = snake_draw_map(sdev->snake);   // 获取地图
         if (NULL == map_data) {
-            printk(KERN_ALERT "[%s] map data init failed!", DEV_NAME);
-            result = -ENOMEM;
+            printk(KERN_ALERT "[%s] can not draw a map!", DEV_NAME);
+            result = -EFAULT;
             goto fail;
         }
-        map_data = snake_draw_map(sdev->snake);   // 获取地图
+        map_size = snake_get_map_size(sdev->snake);
         result = (map_size - *pos) > size ? size : (map_size - *pos);
         if (copy_to_user(buffer, (map_data + *pos), result)) {
             result = -EFAULT;
         } else {
             *pos += result;
         }
-        kfree(map_data);
     }
 
 fail:
