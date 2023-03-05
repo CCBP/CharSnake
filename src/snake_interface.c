@@ -185,7 +185,10 @@ void snake_map_refresh(snake_t *snake)
 
     if (!is_beyond_border(snake, new_head_x, new_head_y)) {
         char data = get_map_raw(snake, new_head_x, new_head_y);
-        if (SNAKE_RAW_MAP == data) {
+        // 前进方向为空地或食物时继续移动
+        // 未移动或后退时不响应动作
+        if ((SNAKE_RAW_MAP  == data) ||
+            (SNAKE_RAW_FOOD == data)) {
             snake->state = STATE_RUNNING;
             // 更新蛇头位置
             snake->head_x = new_head_x;
@@ -201,7 +204,8 @@ void snake_map_refresh(snake_t *snake)
             // 移动蛇头，并以此为基础更新蛇身位置
             set_map_raw(snake, new_head_x, new_head_y, snake->length);
             snake_refresh(snake, new_head_x, new_head_y, snake->length);
-        } else {
+        } else if ((  snake->length != data  ) && // 未移动 
+                   (snake->length - 1 != data)) { // 后退
             snake->state = STATE_FAILED;
         }
     }
