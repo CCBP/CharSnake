@@ -52,11 +52,11 @@ fail:
 static ssize_t snake_write(struct file *fp, const char __user *buffer, size_t size, loff_t *pos)
 {
     snake_dev_t *sdev = fp->private_data;
-    int result = 0;
+    int result = -EINVAL;
     char dir;
 
     // 只取写入数据的最后一位作为控制蛇移动的方向
-    if (copy_from_user(&dir, (buffer + size - 1), 1)) {
+    if (copy_from_user(&dir, (buffer + size - 2), 1)) {
         result = -EFAULT;
         goto fail;
     }
@@ -78,16 +78,14 @@ static ssize_t snake_write(struct file *fp, const char __user *buffer, size_t si
             dir = DIR_PAUSE;
             break;
         default:
-            result = -EINVAL;
             goto fail;
-            break;
     }
     snake_set_dir(sdev->snake, dir);
-    result = dir;
+    result = size;
 
 fail:
-    printk(KERN_ALERT "[%s] move snake, size: %ld  pos: %lld  result: %d\n", 
-                        DEV_NAME, size, *pos, result);
+    printk(KERN_ALERT "[%s] move %d, size: %ld  pos: %lld  result: %d\n", 
+                        DEV_NAME, dir, size, *pos, result);
     return result;
 }
 
