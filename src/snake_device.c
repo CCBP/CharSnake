@@ -17,7 +17,7 @@ typedef struct _snake_dev {
 } snake_dev_t;
 static snake_dev_t *snake_dev;
 
-const int   MAP_SIZE = 128;             // 地图边长
+const int   MAP_SIZE = 11;              // 地图边长
 const char *DEV_NAME = "char_snake";    // 设备名称
 
 static ssize_t snake_read(struct file *fp, char __user *buffer, size_t size, loff_t *pos)

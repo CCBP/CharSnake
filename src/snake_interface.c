@@ -2,14 +2,15 @@
 #include <linux/slab.h>
 #include <linux/random.h>
 
+#define SNAKE_MAP_DATA_MAX (0x7F)       // 地图最大数据量
 /** 
  * 地图原始数据，用于记录地图中各元素的位置
  * 蛇身会在蛇尾的基础上依次递增
  */
 typedef enum {
-    SNAKE_RAW_MAP = 0,              // 地图
-    SNAKE_RAW_TAIL,                 // 蛇尾
-    SNAKE_RAW_FOOD = 0x7F,          // 食物
+    SNAKE_RAW_MAP = 0,                  // 地图
+    SNAKE_RAW_TAIL,                     // 蛇尾
+    SNAKE_RAW_FOOD = SNAKE_MAP_DATA_MAX,// 食物
 
     SNAKE_RAW_MAX = SNAKE_RAW_FOOD,
 } map_raw_t;
@@ -17,25 +18,25 @@ typedef enum {
 /**
  * 地图绘制数据，根据原始数据用以下内容绘制各元素
  */
-const char SNAKE_DRAW_HEAD = '@';    // 蛇头
-const char SNAKE_DRAW_FAIL = 'X';    // 失败
-const char SNAKE_DRAW_SUCC = 'O';    // 成功
-const char SNAKE_DRAW_BODY = '#';    // 蛇身
-const char SNAKE_DRAW_TAIL = '*';    // 蛇尾
-const char SNAKE_DRAW_FOOD = '$';    // 食物
-const char SNAKE_DRAW_MAP  = '.';    // 地图
-const char SNAKE_DRAW_LF   = '\n';   // 换行符
+const char SNAKE_DRAW_HEAD = '@';        // 蛇头
+const char SNAKE_DRAW_FAIL = 'X';        // 失败
+const char SNAKE_DRAW_SUCC = 'O';        // 成功
+const char SNAKE_DRAW_BODY = '#';        // 蛇身
+const char SNAKE_DRAW_TAIL = '*';        // 蛇尾
+const char SNAKE_DRAW_FOOD = '$';        // 食物
+const char SNAKE_DRAW_MAP  = '.';        // 地图
+const char SNAKE_DRAW_LF   = '\n';       // 换行符
 
 struct _snake_t {
-    state_t state;                   // 游戏状态
-    dir_t move_dir;                  // 移动方向
-    int length;                      // 蛇身长度
+    state_t state;                       // 游戏状态
+    dir_t move_dir;                      // 移动方向
+    int length;                          // 蛇身长度
     // 坐标以地图左上角为原点
-    int head_x;                      // 蛇头X轴坐标
-    int head_y;                      // 蛇头y轴坐标
-    size_t map_size;                 // 地图大小
-    char *map_raw;                   // 地图原始数据
-    char *map_draw;                  // 地图显示数据
+    int head_x;                          // 蛇头X轴坐标
+    int head_y;                          // 蛇头y轴坐标
+    size_t map_size;                     // 地图大小
+    char *map_raw;                       // 地图原始数据
+    char *map_draw;                      // 地图显示数据
 };
 
 /**
@@ -228,7 +229,8 @@ int snake_init(snake_t **snake, size_t map_size)
 {
     int result = 0;
 
-    if (map_size <= 0) {
+    if ((             map_size <= 0              ) ||
+        (map_size * map_size > SNAKE_MAP_DATA_MAX)) {
         *snake = NULL;
         result = -EINVAL;
         goto fail;
