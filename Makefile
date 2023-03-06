@@ -1,5 +1,5 @@
 all:
-	cd src && make
+	cd src/driver && make
 
 clean:
-	cd src && make clean
+	cd src/driver && make clean

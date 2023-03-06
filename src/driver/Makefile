@@ -6,8 +6,8 @@ ifneq ($(KERNELRELEASE), )
 else
   KERN_DIR := /lib/modules/$(shell uname -r)/build
   PWD := $(shell pwd)
-  OBJ_DIR := $(PWD)/../obj
-  MOD_DIR := $(PWD)/../mod
+  OBJ_DIR := $(PWD)/../../obj
+  MOD_DIR := $(PWD)/../../mod
 
 all:
 	$(MAKE) -C $(KERN_DIR) M=$(PWD) modules
