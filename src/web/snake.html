@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Snake</title>
+    </head>
+    <body>
+        <pre id="map"></pre>
+        <script>
+            // 获取包含文本内容的 <pre> 元素
+            const mapElement = document.getElementById("map");
+
+            // 设置初始访问路径和定时器间隔时间
+            let path = "/snake_device";
+            const interval = setInterval(updateMap, 1000);
+
+            // 监听键盘按键事件
+            document.addEventListener("keydown", function(event) {
+                // 处理按键事件
+                switch (event.keyCode) {
+                    case 87:  // w 键
+                        path = "example_w.txt";
+                        break;
+                    case 65:  // a 键
+                        path = "example_a.txt";
+                        break;
+                    case 83:  // s 键
+                        path = "example_s.txt";
+                        break;
+                    case 68:  // d 键
+                        path = "example_d.txt";
+                        break;
+                    case 32:  // 空格键
+                        path = "example.txt";
+                        break;
+                }
+            });
+
+            // 定义更新地图内容的函数
+            function updateMap() {
+                // 加载指定路径的地图文件，并将其显示在 <pre> 元素中
+                fetch(path, {
+                    headers: {
+                        "Acceppt": "text/pline",
+                        "Content-Type": "text/plain"    // 文本信息
+                    },
+                    mode: "same-origin",                // 不允许跨域请求
+                    cache: "reload",                    // 忽略本地缓存
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(mapData => mapElement.innerText = mapData)
+                .catch(err => console.error(`Fecth problem: ${err.message}`));
+            }
+        </script>
+    </body>
+</html>
+
