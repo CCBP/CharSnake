@@ -8,10 +8,13 @@ Info="[${Green_font_prefix}信息${Font_color_suffix}]"
 Warring="[${Yellow_font_prefix}警告${Font_color_suffix}]"
 Error="[${Red_font_prefix}错误${Font_color_suffix}]"
 
+Mod="666"
 Pwd="$(pwd)"
 Module="snake"
 Device="char_snake"
-Mod="666"
+Link="snake_device"
+WebDir=$(pwd)/src/web
+Caddyfile="Caddyfile"
 
 CheckRoot() {
     [[ ${EUID} != 0 ]] && echo -e "${Error} 当前账号非ROOT账号(或无ROOT权限)" && exit 1
@@ -30,13 +33,28 @@ Install() {
     grep -q '^staff:' /etc/group || group="wheel"
 
     chgrp ${group} /dev/${Device}
-    chmod ${Mod} /dev/${Device} && echo -e "${Info} 安装成功"
+    chmod ${Mod} /dev/${Device}
+    ln -s /dev/${Device} ${WebDir}/${Link} && echo -e "${Info} 安装成功"
 }
 
 Uninstall() {
     /sbin/rmmod ${Module} $* || exit 1
 
+    rm -f src/web/${Link}
     rm -f /dev/${Device} && echo -e "${Info} 卸载成功"
+}
+
+Run() {
+    major=$(awk "\$2==\"${Device}\" {print \$1}" /proc/devices)
+    if [ ! "$major" = "" ]; then
+        if [ ! "$*" = "" ]; then
+            caddy run $*
+        else
+            caddy run --config ${WebDir}/${Caddyfile}
+        fi
+    else
+        echo -e "${Error} 设备未安装"
+    fi
 }
 
 case "$1" in
@@ -45,6 +63,9 @@ case "$1" in
         ;;
     "uninstall")
         Uninstall ${@:2}
+        ;;
+    "run")
+        Run ${@:2}
         ;;
     *)
         echo -e "${Error} 命令错误"
