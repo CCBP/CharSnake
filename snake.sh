@@ -27,6 +27,8 @@ Build() {
 }
 
 Install() {
+    CheckRoot && exit 1
+
     /sbin/insmod ${Pwd}/mod/${Module}.ko $* || exit 1
 
     rm -f /dev/${Device}
@@ -48,6 +50,8 @@ Install() {
 }
 
 Uninstall() {
+    CheckRoot && exit 1
+
     /sbin/rmmod ${Module} $* || exit 1
 
     rm -f src/web/${Link}
