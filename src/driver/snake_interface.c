@@ -133,8 +133,7 @@ static void generate_food(snake_t *snake)
         if (!is_beyond_border(snake, random_x, random_y)) {
             data = get_map_raw(snake, random_x, random_y);
         }
-        printk(KERN_ALERT "x: %d  y: %d\n", random_x, random_y);
-    } while (SNAKE_RAW_MAX == data);
+    } while (SNAKE_RAW_MAP != data);
     set_map_raw(snake, random_x, random_y, SNAKE_RAW_FOOD);
 }
 
