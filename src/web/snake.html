@@ -34,6 +34,8 @@
                     case 32:  // 空格键
                         moveDir = "PAUSH";
                         break;
+                    default:  // 未定义按键
+                        return;
                 }
                 fetch(moveDir);
             });
