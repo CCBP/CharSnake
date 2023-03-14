@@ -1,4 +1,27 @@
 http://127.0.0.1:2019 {
+    route {
+        exec /UP {
+            command ./snake.sh 
+            args move UP
+        }
+        exec /DOWN {
+            command ./snake.sh 
+            args move DOWN
+        }
+        exec /LEFT {
+            command ./snake.sh 
+            args move LEFT
+        }
+        exec /RIGHT {
+            command ./snake.sh 
+            args move RIGHT
+        }
+        exec /PAUSE {
+            command ./snake.sh 
+            args move PAUSE
+        }
+    }
+
     file_server {
         root src/web/
         index snake.html

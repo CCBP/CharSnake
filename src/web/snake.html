@@ -16,24 +16,26 @@
 
             // 监听键盘按键事件
             document.addEventListener("keydown", function(event) {
+                let moveDir;
                 // 处理按键事件
                 switch (event.keyCode) {
                     case 87:  // w 键
-                        path = "example_w.txt";
+                        moveDir = "UP";
                         break;
                     case 65:  // a 键
-                        path = "example_a.txt";
+                        moveDir = "LEFT";
                         break;
                     case 83:  // s 键
-                        path = "example_s.txt";
+                        moveDir = "DOWN";
                         break;
                     case 68:  // d 键
-                        path = "example_d.txt";
+                        moveDir = "RIGHT";
                         break;
                     case 32:  // 空格键
-                        path = "example.txt";
+                        moveDir = "PAUSH";
                         break;
                 }
+                fetch(moveDir);
             });
 
             // 定义更新地图内容的函数
