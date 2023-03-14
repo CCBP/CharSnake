@@ -13,11 +13,17 @@ Pwd="$(pwd)"
 Module="snake"
 Device="char_snake"
 Link="snake_device"
+DriverDir=${Pwd}/src/driver
 WebDir=${Pwd}/src/web
 Caddyfile="Caddyfile"
 
 CheckRoot() {
     [[ ${EUID} != 0 ]] && echo -e "${Error} 当前账号非ROOT账号(或无ROOT权限)" && exit 1
+}
+
+Build() {
+    cd ${DriverDir}
+    make $* && echo -e "${Info} 完成"
 }
 
 Install() {
@@ -90,6 +96,9 @@ Move() {
 }
 
 case "$1" in
+    "build")
+        Build ${@:2}
+        ;;
     "install")
         Install ${@:2}
         ;;
