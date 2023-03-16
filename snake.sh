@@ -43,7 +43,7 @@ Install() {
     chgrp ${group} /dev/${Device}
     chmod ${Mod} /dev/${Device}
 
-    if [ ! -f "$WebDir/$Link" ]; then
+    if [ -f "$WebDir/$Link" ]; then
         rm ${WebDir}/${Link}
     fi
     ln -s /dev/${Device} ${WebDir}/${Link} && echo -e "${Info} 安装成功"
