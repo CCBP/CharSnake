@@ -26,7 +26,7 @@ typedef enum {
 
 typedef struct _snake_t snake_t;
 
-bool snake_is_success(snake_t *snake);
+state_t snake_get_state(snake_t *snake);
 void snake_map_refresh(snake_t *snake);
 int  snake_init(snake_t **snake, size_t map_size);
 void snake_deinit(snake_t **snake);

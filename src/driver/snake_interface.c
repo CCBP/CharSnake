@@ -138,20 +138,23 @@ static void generate_food(snake_t *snake)
 }
 
 /**
- * snake_is_success - 判断游戏是否成功
- * @snake: 需要判断是否成功的snake_t类型指针
+ * snake_get_state - 获取游戏状态
+ * @snake: 需要获取状态的snake_t类型指针
  *
- * Return: true 游戏结束 false 游戏继续
+ * Return: state_t 类型状态
+ *         - STATE_RUNNING  运行中
+ *         - STATE_SUCCESS  游戏成功
+ *         - STATE_FAILED   游戏失败
+ *         - STATE_PAUSE    游戏暂停
  */
-bool snake_is_success(snake_t *snake)
+state_t snake_get_state(snake_t *snake)
 {
-    bool result = false;
     int map_size = snake_get_map_size(snake);
     if ((snake->length >= SNAKE_RAW_MAX) ||
         (  snake->length >= map_size   ) ) {
-        result = true;
+        snake->state = STATE_SUCCESS;   // 游戏成功
     }
-    return result;
+    return snake->state;
 }
 
 /**
@@ -163,8 +166,9 @@ void snake_map_refresh(snake_t *snake)
     int new_head_x = snake->head_x;
     int new_head_y = snake->head_y;
 
-    if (snake_is_success(snake)) {
-        return;     // 游戏成功，禁止移动
+    if ((STATE_SUCCESS == snake_get_state(snake)) ||
+        ( STATE_FAILED == snake_get_state(snake))) {
+        return;         // 游戏结束，禁止移动
     }
 
     switch (snake->move_dir) {
@@ -197,21 +201,20 @@ void snake_map_refresh(snake_t *snake)
             snake->head_y = new_head_y;
             if (SNAKE_RAW_FOOD == data) {
                 snake->length += 1;              // 吃到食物，蛇身变长
-                if (!snake_is_success(snake)) {  // 若游戏未结束则生成新食物
+                // 更新游戏状态，若游戏未结束则继续生成新食物
+                if (STATE_SUCCESS != snake_get_state(snake)) {
                     generate_food(snake);
-                } else {
-                    snake->state = STATE_SUCCESS;
                 }
             }
             // 移动蛇头，并以此为基础更新蛇身位置
             set_map_raw(snake, new_head_x, new_head_y, snake->length);
             snake_refresh(snake, new_head_x, new_head_y, snake->length);
-        } else if ((  snake->length != data  ) && // 未移动 
-                   (snake->length - 1 != data)) { // 后退
-            snake->state = STATE_FAILED;
+        } else if ((  snake->length != data  ) && // 未移动，不响应动作
+                   (snake->length - 1 != data)) { // 向后退，不响应动作
+            snake->state = STATE_FAILED;          // 撞到蛇身，游戏结束
         }
     } else {
-        snake->state = STATE_FAILED;
+        snake->state = STATE_FAILED;              // 撞到边界，游戏结束
     }
 }
 
