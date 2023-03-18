@@ -5,7 +5,7 @@ Yellow_font_prefix="\033[33m"
 Red_font_prefix="\033[31m"
 Font_color_suffix="\033[0m"
 Info="[${Green_font_prefix}信息${Font_color_suffix}]"
-Warring="[${Yellow_font_prefix}警告${Font_color_suffix}]"
+Warning="[${Yellow_font_prefix}警告${Font_color_suffix}]"
 Error="[${Red_font_prefix}错误${Font_color_suffix}]"
 
 Mod="666"
@@ -19,6 +19,18 @@ Caddyfile="Caddyfile"
 
 CheckRoot() {
     [[ ${EUID} != 0 ]] && echo -e "${Error} 当前账号非ROOT账号(或无ROOT权限)" && exit 1
+}
+
+IsDriverLoaded() {
+    local ret=0
+    major=$(awk "\$2==\"${Device}\" {print \$1}" /proc/devices)
+    if [ "$major" = "" ]; then
+        if [ "$*" != "" ]; then
+            echo -e "${Error} $*"
+        fi
+        ret=1
+    fi
+    return $ret
 }
 
 Build() {
@@ -58,45 +70,49 @@ Uninstall() {
     rm -f /dev/${Device} && echo -e "${Info} 卸载成功"
 }
 
-Run() {
-    major=$(awk "\$2==\"${Device}\" {print \$1}" /proc/devices)
-    if [ ! "$major" = "" ]; then
-        if [ ! "$*" = "" ]; then
-            caddy run $*
-        else
-            caddy run --config ${WebDir}/${Caddyfile}
-        fi
+Reinstall() {
+    if IsDriverLoaded; then
+        Uninstall $*
     else
-        echo -e "${Error} 设备未安装"
+        echo -e "${Warning} 设备未安装"
+    fi
+    Install $*
+}
+
+Run() {
+    IsDriverLoaded "设备未安装" || exit 1
+    if [ ! "$*" = "" ]; then
+        caddy run $*
+    else
+        caddy run --config ${WebDir}/${Caddyfile}
     fi
 }
 
 Move() {
-    major=$(awk "\$2==\"${Device}\" {print \$1}" /proc/devices)
-    if [ ! "$major" = "" ]; then
-        case $* in
-            "UP")
-                echo "U" > ${WebDir}/${Link}
-                ;;
-            "DOWN")
-                echo "D" > ${WebDir}/${Link}
-                ;;
-            "LEFT")
-                echo "L" > ${WebDir}/${Link}
-                ;;
-            "RIGHT")
-                echo "R" > ${WebDir}/${Link}
-                ;;
-            "PAUSE")
-                echo "P" > ${WebDir}/${Link}
-                ;;
-            *)
-                echo -e "${Error} 方向错误，请使用UP、DOWN、LEFT、RIGHT控制移动，使用PAUSE暂停"
-                ;;
-        esac
-    else
-        echo -e "${Error} 设备未安装"
-    fi
+    IsDriverLoaded "设备未安装" || exit 1
+    case $* in
+        "UP")
+            echo "U" > ${WebDir}/${Link}
+            ;;
+        "DOWN")
+            echo "D" > ${WebDir}/${Link}
+            ;;
+        "LEFT")
+            echo "L" > ${WebDir}/${Link}
+            ;;
+        "RIGHT")
+            echo "R" > ${WebDir}/${Link}
+            ;;
+        "PAUSE")
+            echo "P" > ${WebDir}/${Link}
+            ;;
+        "RESTART")
+            Reinstall
+            ;;
+        *)
+            echo -e "${Error} 请使用UP、DOWN、LEFT、RIGHT控制移动，使用PAUSE暂停，RESTART重新开始"
+            ;;
+    esac
 }
 
 case "$1" in
@@ -108,6 +124,9 @@ case "$1" in
         ;;
     "uninstall")
         Uninstall ${@:2}
+        ;;
+    "reinstall")
+        Reinstall ${@:2}
         ;;
     "run")
         Run ${@:2}
