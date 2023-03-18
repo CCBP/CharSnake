@@ -192,7 +192,6 @@ void snake_map_refresh(snake_t *snake)
     if (!is_beyond_border(snake, new_head_x, new_head_y)) {
         char data = get_map_raw(snake, new_head_x, new_head_y);
         // 前进方向为空地或食物时继续移动
-        // 未移动或后退时不响应动作
         if ((SNAKE_RAW_MAP  == data) ||
             (SNAKE_RAW_FOOD == data)) {
             snake->state = STATE_RUNNING;
@@ -209,8 +208,7 @@ void snake_map_refresh(snake_t *snake)
             // 移动蛇头，并以此为基础更新蛇身位置
             set_map_raw(snake, new_head_x, new_head_y, snake->length);
             snake_refresh(snake, new_head_x, new_head_y, snake->length);
-        } else if ((  snake->length != data  ) && // 未移动，不响应动作
-                   (snake->length - 1 != data)) { // 向后退，不响应动作
+        } else if (snake->length != data) {       // 未移动，不响应动作
             snake->state = STATE_FAILED;          // 撞到蛇身，游戏结束
         }
     } else {
@@ -355,8 +353,16 @@ char *snake_draw_map(snake_t *snake)
  * snake_set_dir - 设置snake的移动方向
  * @snake: 需要设置移动方向的snake_t类型指针
  * @dir: 移动方向
+ *
+ * 若蛇身长度大于1，设置方向与当前方向相同或相反时
+ * 设置不生效，即：上与下、左与右
  */
 void snake_set_dir(snake_t *snake, dir_t dir)
 {
+    if ((      1 < snake->length       ) &&
+        (       DIR_PAUSE > dir        ) && // 方向设置
+        (snake->move_dir / 2 == dir / 2)) { // 设置方向与当前方向相同或相反
+        return;
+    }
     snake->move_dir = dir;
 }
