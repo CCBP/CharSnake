@@ -13,6 +13,7 @@ Pwd="$(pwd)"
 Module="snake"
 Device="char_snake"
 Link="snake_device"
+ServerDir=${Pwd}/assets/caddy
 DriverDir=${Pwd}/src/driver
 WebDir=${Pwd}/src/web
 Caddyfile="Caddyfile"
@@ -82,9 +83,9 @@ Reinstall() {
 Run() {
     IsDriverLoaded "设备未安装" || exit 1
     if [ ! "$*" = "" ]; then
-        caddy run $*
+        ${ServerDir}/caddy run $*
     else
-        caddy run --config ${WebDir}/${Caddyfile}
+        ${ServerDir}/caddy run --config ${WebDir}/${Caddyfile}
     fi
 }
 
