@@ -20,6 +20,10 @@ http://127.0.0.1:2019 {
             command ./snake.sh 
             args move PAUSE
         }
+        exec /RESTART {
+            command ./snake.sh
+            args move RESTART
+        }
     }
 
     file_server {

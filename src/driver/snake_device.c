@@ -66,20 +66,28 @@ static ssize_t snake_write(struct file *fp, const char __user *buffer, size_t si
     }
 
     switch (dir) {
-        case 'U':   // 向上
+        case 'W':   // 向上
             dir = DIR_UP;
             break;
-        case 'D':   // 向下
+        case 'S':   // 向下
             dir = DIR_DOWN;
             break;
-        case 'L':   // 向左
+        case 'A':   // 向左
             dir = DIR_LEFT;
             break;
-        case 'R':   // 向右
+        case 'D':   // 向右
             dir = DIR_RIGHT;
             break;
         case 'P':   // 暂停
             dir = DIR_PAUSE;
+            break;
+        case 'R':   // 重新开始
+            result = snake_init(&snake_dev->snake, MAP_SIZE);
+            if (NULL == snake_dev->snake) {
+                printk(KERN_ALERT "[%s] snake init failed! result: %d\n", DEV_NAME, result);
+                result = -ENOMEM;
+                goto fail;
+            }
             break;
         default:
             goto fail;

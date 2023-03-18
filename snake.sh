@@ -92,22 +92,22 @@ Move() {
     IsDriverLoaded "设备未安装" || exit 1
     case $* in
         "UP")
-            echo "U" > ${WebDir}/${Link}
+            echo "W" > ${WebDir}/${Link}
             ;;
         "DOWN")
-            echo "D" > ${WebDir}/${Link}
+            echo "S" > ${WebDir}/${Link}
             ;;
         "LEFT")
-            echo "L" > ${WebDir}/${Link}
+            echo "A" > ${WebDir}/${Link}
             ;;
         "RIGHT")
-            echo "R" > ${WebDir}/${Link}
+            echo "D" > ${WebDir}/${Link}
             ;;
         "PAUSE")
             echo "P" > ${WebDir}/${Link}
             ;;
         "RESTART")
-            Reinstall
+            echo "R" > ${WebDir}/${Link}
             ;;
         *)
             echo -e "${Error} 请使用UP、DOWN、LEFT、RIGHT控制移动，使用PAUSE暂停，RESTART重新开始"
