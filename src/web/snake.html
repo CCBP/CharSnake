@@ -3,9 +3,49 @@
     <head>
         <meta charset="UTF-8">
         <title>Snake</title>
+        <link href="style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <pre id="map"></pre>
+        <table align="center">
+            <tr>
+                <td rowspan="7" width="20%">
+                    <pre id="map"></pre>
+                </td>
+                <th colspan="6" width="60%">游戏玩法</th>
+            </tr>
+            <tr>
+                <td colspan="6"><code>W</code> <code>S</code> <code>A</code> <code>D</code> 向上、下、左、右移动</td>
+            </tr>
+            <tr>
+                <td colspan="3"><code>Space</code> 暂停游戏</td>
+                <td colspan="3"><code>R</code> 重新开始</td>
+            </tr>
+            <tr>
+                <th colspan="6">游戏信息</th>
+            </tr>
+            <tr>
+                <td colspan="2"><code>@</code> 蛇头</td>
+                <td colspan="2"><code>#</code> 蛇身</td>
+                <td colspan="2"><code>*</code> 蛇尾</td>
+            </tr>
+            <tr>
+                <td colspan="3"><code>$</code> 食物</td>
+                <td colspan="3"><code>.</code> 空白地图</td>
+            </tr>
+            <tr>
+                <td colspan="3"><code>O</code> 游戏成功</td>
+                <td colspan="3"><code>X</code> 游戏失败</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td width="10%"></td>
+                <td width="10%"></td>
+                <td width="10%"></td>
+                <td width="10%"></td>
+                <td width="10%"></td>
+                <td width="10%"></td>
+            </tr>
+        </table>
         <script>
             // 获取包含文本内容的 <pre> 元素
             const mapElement = document.getElementById("map");
