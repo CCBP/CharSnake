@@ -310,7 +310,8 @@ void snake_deinit(snake_t **snake)
  */
 char *snake_draw_map(snake_t *snake)
 {
-    for (int i = 0, j = 0; j < snake_get_map_size(snake); i++, j++) {
+    int i, j;
+    for (i = 0, j = 0; j < snake_get_map_size(snake); i++, j++) {
         char data_raw = *(snake->map_raw + i);
         char data_draw;
         switch (data_raw) {
