@@ -16,6 +16,7 @@
 
 <div align="center">
     <img src="assets/image/char_snake_architecture.png" alt="architecture" width="50%">
+    <p>贪吃蛇游戏架构</p>
 </div><br />
 
 ## 🛠️ 安装
