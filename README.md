@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="assets/image/char_snake.jpg" alt="banner" width="30%">
+    <img src="assets/image/char_snake.jpg" alt="banner" width="40%">
 </div><br />
 
 # 🐍 Char Snake | Linux字符设备驱动贪吃蛇游戏 🕹️
@@ -15,7 +15,7 @@
 该游戏以字符设备scull为原型实现的字符驱动设备为基础，提供了统一的接口可以使用echo与cat等命令在终端进行控制；并且可以通过脚本快速且简单的进行驱动的安装卸载、游戏的移动控制、网络服务器的运行启动等功能；配合Caddy服务器实现地图数据的请求与控制命令的响应。
 
 <div align="center">
-    <img src="assets/image/char_snake_architecture.png" alt="architecture" width="30%">
+    <img src="assets/image/char_snake_architecture.png" alt="architecture" width="50%">
 </div><br />
 
 ## 🛠️ 安装
